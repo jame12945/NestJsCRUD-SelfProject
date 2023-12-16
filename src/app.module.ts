@@ -10,6 +10,8 @@ import { Todo } from './todos/todo.entity';
 import { join } from 'path';
 import { User } from './typeorm/entities/User';
 import { UsersModule } from './users/users.module';
+import { Profile } from './typeorm/entities/Profile';
+import { PostFromUser } from './typeorm/entities/Post';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -23,7 +25,7 @@ import { UsersModule } from './users/users.module';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
         // entities: [join(process.cwd(), 'dist/**/*.entity.js')],
-        entities: [User],
+        entities: [User , Profile , PostFromUser],
         synchronize: true,
       }),
       inject: [ConfigService],

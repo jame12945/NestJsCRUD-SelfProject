@@ -11,3 +11,15 @@ export type UpdateUserParams = {
     password:string ;
   
 }
+
+export type CreateUserProfileParams = {
+    firstname:string;
+    lastname:string;
+    age:number;
+    dateofbirth: string;
+}
+
+export type CreateUserPostParams ={
+    title:string;
+    description:string;
+}
