@@ -1,3 +1,13 @@
+/* eslint-disable prettier/prettier */
+import { IsNotEmpty } from "class-validator";
+
+
 export class CreateTodoDto {
-    title: string;
+    @IsNotEmpty()
+    titles: string;
+
+    @IsNotEmpty()
+    descriptions:string
+
+
 }

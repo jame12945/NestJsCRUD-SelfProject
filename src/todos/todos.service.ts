@@ -1,6 +1,7 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from "@nestjs/common";
 import { Todo } from "./todo.entity";
-import { Repository } from "typeorm";
+import { DeepPartial, Repository } from "typeorm";
 import { CreateTodoDto } from "./dtos/create-todo.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 
@@ -9,7 +10,7 @@ export class TodosService {
   constructor(@InjectRepository(Todo) private readonly todoRepository: Repository<Todo>){}
   //Hard Code for now
   async create(dto: CreateTodoDto) {
-    const todo = this.todoRepository.create(dto);
+    const todo = this.todoRepository.create(dto as DeepPartial<Todo>);
 
     return await this.todoRepository.save(todo);
   }

@@ -1,10 +1,22 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+/* eslint-disable prettier/prettier */
+import { Column, Entity, PrimaryGeneratedColumn , CreateDateColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({ name: 'todos'})
 export class Todo {
     @PrimaryGeneratedColumn()
-    id: number;
+    id:number
 
     @Column()
-    title: string;
+    titles:string
+
+    @Column()
+    descriptions:string
+
+    @CreateDateColumn()
+    created:Date
+
+    @UpdateDateColumn()
+    updated:Date
+
+    
 }

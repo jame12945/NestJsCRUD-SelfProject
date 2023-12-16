@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Body, Controller, Post, Get, Put, Param, Delete } from "@nestjs/common";
 import { TodosService } from "./todos.service";
 import { CreateTodoDto } from "./dtos/create-todo.dto";
