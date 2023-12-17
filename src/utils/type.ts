@@ -23,3 +23,9 @@ export type CreateUserPostParams ={
     title:string;
     description:string;
 }
+
+export type CreateUserAuthParams ={
+    name: string;
+    email: string;
+    password: string;
+}

@@ -1,16 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Catch, Controller, Delete, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put, Req, Res, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from 'src/users/dtos/CreateUser.dto';
+import { CreateUserAuthDto } from 'src/users/dtos/CreateUserAuth.dto';
 import { CreateUserPostDto } from 'src/users/dtos/CreateUserPost.dto';
 import { CreateUserProfileDto } from 'src/users/dtos/CreateUserProfie.dto';
 import { UpdateUserDto } from 'src/users/dtos/UpdateUser.dto';
 import { UsersService } from 'src/users/services/users/users.service';
+import * as bcrypt from 'bcrypt'
+import { JwtService } from '@nestjs/jwt';
+import { Response,Request } from 'express'
+import { PassThrough } from 'stream';
 
 @Controller('users')
 export class UsersController {
     
-    constructor(private userService: UsersService){}
+    constructor(
+        private userService: UsersService,
+        private jwtService: JwtService
+       
+        ){}
 
     @Get()
     getUsers(){
@@ -59,4 +68,71 @@ export class UsersController {
             return this.userService.createUserPost(id,createUserPostDto);
         }
 
+    //Add Logic Authenication here
+    @Post('register')
+    async register(@Body() createUserAuthDto: CreateUserAuthDto ){
+        const saltOrRounds = 10;
+        const hashedPassword = await bcrypt.hash(createUserAuthDto.password ,saltOrRounds); 
+        const registrationData = {
+            name: createUserAuthDto.name,
+            email: createUserAuthDto.email,
+            password: hashedPassword,
+          };
+
+        return this.userService.createUserRegister(registrationData)
+    }
+    @Post('login')
+    async login(
+        @Body() createUserAuthDto: CreateUserAuthDto , 
+        @Res({passthrough: true}) response: Response,
+        ) {
+        const user = await this.userService.findloginUser(createUserAuthDto.email);
+         if(!user){
+            throw new HttpException(
+                'User not found. Cannot Login',
+                HttpStatus.BAD_REQUEST,
+               );
+         }
+        if(!await bcrypt.compare( createUserAuthDto.password, user.password)){
+            throw new HttpException(
+                'Password mismatch',
+                HttpStatus.BAD_REQUEST,
+               );
+        }
+
+        //store jwt in cookie as http for use in frontend
+        const jwt = await this.jwtService.signAsync({id: user.id})
+
+        response.cookie('jwt', jwt, {httpOnly: true});
+        
+        // return user;
+        // return jwt
+        
+        return {
+            message: 'success!',
+        }
+
+      }
+
+      
+      //next retrive the cookie
+      @Get('getcookie')
+      async getcookie(@Req() request: Request){
+        try{
+        const cookie = request.cookies['jwt'];
+        const data = await this.jwtService.verifyAsync(cookie);
+        console.log('Verified data:', data);
+        if(!data){
+            throw new UnauthorizedException()
+        }
+        //return user data from cookie
+        const user = await this.userService.findIdinUser({id: data['id']});
+        console.log('User data:', user);
+        return user;
+        
+    }
+     catch(e){
+        throw new UnauthorizedException()
+     }
+      }
 }

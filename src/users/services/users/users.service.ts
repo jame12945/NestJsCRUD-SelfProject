@@ -5,8 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PostFromUser } from 'src/typeorm/entities/Post';
 import { Profile } from 'src/typeorm/entities/Profile';
 import { User } from 'src/typeorm/entities/User';
-import { CreateUserParams, CreateUserPostParams, CreateUserProfileParams, UpdateUserParams } from 'src/utils/type';
-import { Repository } from 'typeorm';
+import { UserAuth } from 'src/typeorm/entities/UsersAuth';
+import { CreateUserAuthParams, CreateUserParams, CreateUserPostParams, CreateUserProfileParams, UpdateUserParams } from 'src/utils/type';
+import { FindOneOptions, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +17,8 @@ export class UsersService {
     // 2.define entity files in constructor
     constructor(@InjectRepository(User) private userRepository: Repository<User> ,
                 @InjectRepository(Profile) private profileRepository: Repository<Profile>,
-                @InjectRepository(PostFromUser) private postRepository: Repository<PostFromUser>){}
+                @InjectRepository(PostFromUser) private postRepository: Repository<PostFromUser>,
+                @InjectRepository(UserAuth) private userAuthRepository: Repository<UserAuth>){}
     
     findUsers(){
         //find all users in database
@@ -76,6 +78,19 @@ export class UsersService {
       });
       return this.postRepository.save(newPost)
     }
+
+    //add logic register,login here
+    async createUserRegister(createUserDetails: CreateUserAuthParams): Promise<UserAuth>{
+      return this.userAuthRepository.save(createUserDetails);
+    }
+
+   async findloginUser(email: CreateUserAuthParams['email']): Promise<UserAuth> {
+             return this.userAuthRepository.findOne({where: { email }});
+   }
+
+   async findIdinUser(id:any): Promise<UserAuth> {
+    return this.userAuthRepository.findOne({where: id});
+}
 
 
 }

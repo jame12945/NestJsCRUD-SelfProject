@@ -6,10 +6,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/typeorm/entities/User';
 import { Profile } from 'src/typeorm/entities/Profile';
 import { PostFromUser } from 'src/typeorm/entities/Post';
+import { UserAuth } from 'src/typeorm/entities/UsersAuth';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   //if user User in dervice dont forhet to use imports: [TypeOrmModule.forFeature([User])]
-  imports: [TypeOrmModule.forFeature([User ,Profile, PostFromUser])],
+  imports: [TypeOrmModule.forFeature([User ,Profile, PostFromUser, UserAuth]),
+  JwtModule.register({
+    secret: 'secret',
+    signOptions: {expiresIn: '1d'},
+ }),],
   controllers: [UsersController],
   providers: [UsersService]
 })
